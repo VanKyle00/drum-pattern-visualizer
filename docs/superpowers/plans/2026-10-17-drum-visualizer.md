@@ -1,6 +1,6 @@
 # MIDI Drum Video Editor Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Build a local GUI that imports MIDI, maps notes to customizable draggable elements, and exports videos at editable canvas dimensions.
 
@@ -89,8 +89,8 @@ Positions are normalized in [0,1], size is a radius fraction of the shorter canv
 
 **Interfaces:** Produce `defaultProject(): Project`, `parseProject(json: string): Project`, `serializeProject(project: Project): string`, `validateCanvas(width: number, height: number): boolean`.
 
-- [ ] Set up scripts `dev`, `build`, `test`, `test:e2e`, `start`; use TypeScript checking plus Vite for build, Vitest for unit tests. Exclude node_modules, dist, test artifacts and render jobs from Git.
-- [ ] Write the model tests before implementation:
+- [x] Set up scripts `dev`, `build`, `test`, `test:e2e`, `start`; use TypeScript checking plus Vite for build, Vitest for unit tests. Exclude node_modules, dist, test artifacts and render jobs from Git.
+- [x] Write the model tests before implementation:
   ```ts
   expect(validateCanvas(1080, 1920)).toBe(true);
   expect(validateCanvas(1081, 1920)).toBe(false);
@@ -99,9 +99,9 @@ Positions are normalized in [0,1], size is a radius fraction of the shorter canv
   expect(parseProject(serializeProject(original))).toEqual(original);
   expect(() => parseProject('{"version":99}')).toThrow();
   ```
-- [ ] Run `npm test -- tests/project.test.ts`; confirm missing implementations fail, then implement the schema and defaults. Default elements are kick [36], snare [38,40], hi-hat [42,44,46], channel null, center-stage arrangement, 1080×1920 canvas and 30 fps.
-- [ ] Build an editor shell with element list left, preview center, inspector right and transport below. Use restrained dark editing surfaces, clear labels and a responsive stacked layout. Show meaningful empty-MIDI state and upload action.
-- [ ] Run `npm test -- tests/project.test.ts` and `npm run build`; commit the model and shell together.
+- [x] Run `npm test -- tests/project.test.ts`; confirm missing implementations fail, then implement the schema and defaults. Default elements are kick [36], snare [38,40], hi-hat [42,44,46], channel null, center-stage arrangement, 1080×1920 canvas and 30 fps.
+- [x] Build an editor shell with element list left, preview center, inspector right and transport below. Use restrained dark editing surfaces, clear labels and a responsive stacked layout. Show meaningful empty-MIDI state and upload action.
+- [x] Run `npm test -- tests/project.test.ts` and `npm run build`; commit the model and shell together.
 
 ## Task 2: MIDI import, tempo conversion and mappings
 
@@ -109,8 +109,8 @@ Positions are normalized in [0,1], size is a radius fraction of the shorter canv
 
 **Interfaces:** Produce `parseMidiBytes(bytes: Uint8Array): MidiData`, `noteLabel(note: number, octaveOffset: -1 | 0 | 1): string`. Consume `Project`, `Hit`, `MidiData` from Task 1. `noteLabel(60,0)` is C4; -1 displays C3; +1 displays C5.
 
-- [ ] Generate MIDI fixtures using midi-file's writer: format 0 with simultaneous hits, format 1 with a separate tempo track, velocity-zero note-on, end-of-track trailing silence, and invalid format/timing headers.
-- [ ] Write tests with exact expectations:
+- [x] Generate MIDI fixtures using midi-file's writer: format 0 with simultaneous hits, format 1 with a separate tempo track, velocity-zero note-on, end-of-track trailing silence, and invalid format/timing headers.
+- [x] Write tests with exact expectations:
   ```ts
   // Fixture PPQ 480; 500000 us/quarter until tick 480, then 1000000.
   expect(parseMidiBytes(tempoFixture()).hits.map(h => h.seconds)).toEqual([0, .5, 1.5]);
@@ -119,9 +119,9 @@ Positions are normalized in [0,1], size is a radius fraction of the shorter canv
   expect(parseMidiBytes(zeroVelocityFixture()).hits).toHaveLength(1);
   expect(() => parseMidiBytes(new Uint8Array([0,1,2]))).toThrow();
   ```
-- [ ] Run `npm test -- tests/midi.test.ts` and observe failure; implement absolute track ticks, stable global tempo ordering, default 500000 µs/quarter, tick-to-seconds integration and maximum end-of-track duration. Reject format 2 and SMPTE explicitly. Surface no-hit and zero-duration imports as readable non-exportable states.
-- [ ] Build detected-note rows with number, display name, channel and hit count; assignment adds a note to the selected element. Add manual note input and channel filter. Highlight notes unmatched by any element. Preserve all element settings on subsequent imports and replace parsed MIDI atomically only after success.
-- [ ] Run unit tests; add UI checks that corrupt import preserves the existing project and a second valid import preserves custom mappings while replacing note counts. Commit the import/mapping flow.
+- [x] Run `npm test -- tests/midi.test.ts` and observe failure; implement absolute track ticks, stable global tempo ordering, default 500000 µs/quarter, tick-to-seconds integration and maximum end-of-track duration. Reject format 2 and SMPTE explicitly. Surface no-hit and zero-duration imports as readable non-exportable states.
+- [x] Build detected-note rows with number, display name, channel and hit count; assignment adds a note to the selected element. Add manual note input and channel filter. Highlight notes unmatched by any element. Preserve all element settings on subsequent imports and replace parsed MIDI atomically only after success.
+- [x] Run unit tests; add UI checks that corrupt import preserves the existing project and a second valid import preserves custom mappings while replacing note counts. Commit the import/mapping flow.
 
 ## Task 3: Shared animation and editable geometry
 
@@ -129,7 +129,7 @@ Positions are normalized in [0,1], size is a radius fraction of the shorter canv
 
 **Interfaces:** Produce `evaluateScene(project: Project, midi: MidiData, seconds: number): Scene`, `drawScene(ctx: CanvasRenderingContext2D, scene: Scene): void`, `createHistory(initial: Project)` with `commit(next)`, `undo()`, `redo()`, `current()` methods. Consume Task 1/2 types.
 
-- [ ] Add failing deterministic geometry tests:
+- [x] Add failing deterministic geometry tests:
   ```ts
   const p = defaultProject(); const m = parseMidiBytes(singleKickFixture());
   expect(evaluateScene(p,m,.1)).toEqual(evaluateScene(p,m,.1));
@@ -139,10 +139,10 @@ Positions are normalized in [0,1], size is a radius fraction of the shorter canv
   const history = createHistory(p); history.commit(resized);
   expect(history.undo()).toEqual(p); expect(history.redo()).toEqual(resized);
   ```
-- [ ] Run targeted tests; implement matched-hit lookup by note/channel. Use maximum decaying matched velocity (`velocity * exp(-age / decay)`) within a bounded decay window, base radius plus strength-scaled reaction, and deterministic particles with no random values per frame. No future hit may affect an earlier timestamp.
-- [ ] Draw circle, square, diamond and triangle plus optional ripple/particles in paint order. Clear and fill the canvas background every frame. Exclude editor guides and handles from `drawScene`.
-- [ ] Implement pointer capture, reverse paint-order hit testing, normalized drag coordinates and radius handles. Fit canvas into the preview viewport and account for letterboxing, CSS scaling and device pixel ratio. Commit one undo entry per drag, not per pointer move; pointer cancellation restores the starting geometry.
-- [ ] Run scene/history tests and browser checks for dragging at two preview sizes, backward seeking, shared notes and channel filtering. Commit scene and direct editing.
+- [x] Run targeted tests; implement matched-hit lookup by note/channel. Use maximum decaying matched velocity (`velocity * exp(-age / decay)`) within a bounded decay window, base radius plus strength-scaled reaction, and deterministic particles with no random values per frame. No future hit may affect an earlier timestamp.
+- [x] Draw circle, square, diamond and triangle plus optional ripple/particles in paint order. Clear and fill the canvas background every frame. Exclude editor guides and handles from `drawScene`.
+- [x] Implement pointer capture, reverse paint-order hit testing, normalized drag coordinates and radius handles. Fit canvas into the preview viewport and account for letterboxing, CSS scaling and device pixel ratio. Commit one undo entry per drag, not per pointer move; pointer cancellation restores the starting geometry.
+- [x] Run scene/history tests and browser checks for dragging at two preview sizes, backward seeking, shared notes and channel filtering. Commit scene and direct editing.
 
 ## Task 4: Full editor controls and project persistence
 
@@ -150,7 +150,7 @@ Positions are normalized in [0,1], size is a radius fraction of the shorter canv
 
 **Interfaces:** Inspector and settings take `{project, onChange(next: Project)}`; transport takes `{time, duration, playing, onSeek(seconds), onPlayingChange(playing)}`. App owns history, selection, parsed MIDI and playhead; project serialization stays in Task 1.
 
-- [ ] Add browser acceptance checks before implementation:
+- [x] Add browser acceptance checks before implementation:
   ```ts
   await page.getByRole('button',{name:'Add element',exact:true}).click();
   await page.getByLabel('Element name').fill('Clap');
@@ -158,11 +158,11 @@ Positions are normalized in [0,1], size is a radius fraction of the shorter canv
   await page.getByLabel('Canvas width').fill('1081');
   await expect(page.getByRole('alert')).toContainText('even');
   ```
-- [ ] Implement element rename, duplicate with new ID, remove, layer movement, note mapping, shape/color, numeric x/y/size, strength/decay and ripple/particle toggles. Keep selection valid after deletion and undo.
-- [ ] Implement custom canvas dimensions, four presets, aspect lock, width/height swap, background, caption guides and undo/redo. For locked edits derive the other dimension from the stored ratio; if either is invalid show the proposed values and do not apply silently rounded dimensions. Preserve normalized placement and shorter-edge sizing.
-- [ ] Add layout buttons for stack/center/diagonal; reposition the starter elements only, preserving all mappings/styles and custom elements. Provide play/pause, seconds display and scrubber based on MIDI duration. Pause on MIDI replacement and clamp seeking to the new duration.
-- [ ] Implement save/download and open-project file controls. Persist MIDI bytes inside JSON; parse schema and MIDI before replacing current state. Save/reload canvas settings and mapping; show file and parse errors inline.
-- [ ] Run `npm run test:e2e -- e2e/editor.spec.ts`; extend checks to duplicate/remove, save/reopen, presets, swap, undo and corrupt project recovery. Commit complete editor interaction.
+- [x] Implement element rename, duplicate with new ID, remove, layer movement, note mapping, shape/color, numeric x/y/size, strength/decay and ripple/particle toggles. Keep selection valid after deletion and undo.
+- [x] Implement custom canvas dimensions, four presets, aspect lock, width/height swap, background, caption guides and undo/redo. For locked edits derive the other dimension from the stored ratio; if either is invalid show the proposed values and do not apply silently rounded dimensions. Preserve normalized placement and shorter-edge sizing.
+- [x] Add layout buttons for stack/center/diagonal; reposition the starter elements only, preserving all mappings/styles and custom elements. Provide play/pause, seconds display and scrubber based on MIDI duration. Pause on MIDI replacement and clamp seeking to the new duration.
+- [x] Implement save/download and open-project file controls. Persist MIDI bytes inside JSON; parse schema and MIDI before replacing current state. Save/reload canvas settings and mapping; show file and parse errors inline.
+- [x] Run `npm run test:e2e -- e2e/editor.spec.ts`; extend checks to duplicate/remove, save/reopen, presets, swap, undo and corrupt project recovery. Commit complete editor interaction.
 
 ## Task 5: Offline MP4 rendering and job controls
 
@@ -170,19 +170,19 @@ Positions are normalized in [0,1], size is a radius fraction of the shorter canv
 
 **Interfaces:** `POST /api/jobs` accepts `{project: Project}` and returns `{id}`. `GET /api/jobs/:id` returns `{id,status,completedFrames,totalFrames,error?}`. `DELETE /api/jobs/:id` cancels. `GET /api/jobs/:id/video` downloads completed output. Status values: queued, rendering, encoding, complete, cancelled, failed. Produce browser render entry `window.renderProjectFrame(project: Project, seconds: number): Promise<string>` returning a PNG data URL using Tasks 2/3.
 
-- [ ] Write boundary tests for odd dimensions, end<=start, nonfinite timestamps, duration limit, invalid repeat count and a second concurrent job. Return actionable 4xx responses before creating output directories. Limit to one active render initially.
-- [ ] Implement a same-origin local server on loopback with bounded JSON payloads, Origin/Host validation and a session token required on mutating routes; do not enable wildcard CORS. Serve built editor/render assets. Job IDs are server-generated; download endpoints resolve internal job paths only.
-- [ ] Launch Playwright Chromium for the render page. For frame index `i`, evaluate time with:
+- [x] Write boundary tests for odd dimensions, end<=start, nonfinite timestamps, duration limit, invalid repeat count and a second concurrent job. Return actionable 4xx responses before creating output directories. Limit to one active render initially.
+- [x] Implement a same-origin local server on loopback with bounded JSON payloads, Origin/Host validation and a session token required on mutating routes; do not enable wildcard CORS. Serve built editor/render assets. Job IDs are server-generated; download endpoints resolve internal job paths only.
+- [x] Launch Playwright Chromium for the render page. For frame index `i`, evaluate time with:
   ```ts
   const range = project.export.end - project.export.start;
   const frames = Math.ceil(range * project.export.repeats * project.export.fps);
   const seconds = project.export.start + (i / project.export.fps) % range;
   ```
   Each repeat restarts from the selected source range; effects follow source timeline at that time. Parse MIDI once per immutable export snapshot. Use a verified job-owned directory and stream PNG buffers with backpressure into FFmpeg stdin instead of retaining all frames in memory.
-- [ ] Encode with argument-array process spawning: image2pipe PNG input, chosen frame rate, libx264, yuv420p and faststart, writing a temporary MP4. Publish with a final rename only after exit code 0 and nonempty output. Track rendering frames separately from encoder finalization; drain stderr for concise actionable errors.
-- [ ] Implement cancellation by stopping frame generation, closing Chromium and terminating the encoder; cleanup must be idempotent and scoped to that job. On encoder/spawn/write failures mark failed, retain a readable reason and never expose partial output as complete. Use unique export filenames, browser save/download destination and no automatic overwrite.
-- [ ] Build export UI for range, repeats, 30/60 fps, read-only canvas dimensions, destination explanation, progress, cancel and download. Snapshot state on start. Disable export without usable MIDI or valid settings.
-- [ ] Test fake encoder failure/cancellation and run a real 320×568 two-second export. Use ffprobe to assert H.264, yuv420p, dimensions, frame rate and duration within one frame. Compare preview and headless PNGs at identical timestamps before encoding, then inspect decoded video visually. Verify editing during export does not change its dimensions. Commit exporter.
+- [x] Encode with argument-array process spawning: image2pipe PNG input, chosen frame rate, libx264, yuv420p and faststart, writing a temporary MP4. Publish with a final rename only after exit code 0 and nonempty output. Track rendering frames separately from encoder finalization; drain stderr for concise actionable errors.
+- [x] Implement cancellation by stopping frame generation, closing Chromium and terminating the encoder; cleanup must be idempotent and scoped to that job. On encoder/spawn/write failures mark failed, retain a readable reason and never expose partial output as complete. Use unique export filenames, browser save/download destination and no automatic overwrite.
+- [x] Build export UI for range, repeats, 30/60 fps, read-only canvas dimensions, destination explanation, progress, cancel and download. Snapshot state on start. Disable export without usable MIDI or valid settings.
+- [x] Test fake encoder failure/cancellation and run a real 320×568 two-second export. Use ffprobe to assert H.264, yuv420p, dimensions, frame rate and duration within one frame. Compare preview and headless PNGs at identical timestamps before encoding, then inspect decoded video visually. Verify editing during export does not change its dimensions. Commit exporter.
 
 ## Task 6: End-to-end delivery
 
@@ -190,10 +190,10 @@ Positions are normalized in [0,1], size is a radius fraction of the shorter canv
 
 **Interfaces:** `npm run dev` starts editor and local API; `npm run build` creates production client/server output; `npm start` serves the built application locally.
 
-- [ ] Document Node setup, dependency installation, Playwright Chromium installation, FFmpeg PATH requirement, launch commands, configurable note labels, project save/load and solid-background silent export behavior.
-- [ ] Run `npm test`, `npm run build`, and `npm run test:e2e`. Investigate failures before marking work complete; do not substitute mocked export tests for the real video test.
-- [ ] Inspect the GUI at desktop and narrow widths; exercise MIDI upload, custom element, note assignment, drag, resize, canvas orientation swap, save/reopen and export. Verify file chooser/download interaction on Windows and no editor chrome in the exported frames.
-- [ ] Run final diff checks and review the spec against implemented behavior. Commit documentation and fixes, launch the application, and provide the local URL and verified export result.
+- [x] Document Node setup, dependency installation, Playwright Chromium installation, FFmpeg PATH requirement, launch commands, configurable note labels, project save/load and solid-background silent export behavior.
+- [x] Run `npm test`, `npm run build`, and `npm run test:e2e`. Investigate failures before marking work complete; do not substitute mocked export tests for the real video test.
+- [x] Inspect the GUI at desktop and narrow widths; exercise MIDI upload, custom element, note assignment, drag, resize, canvas orientation swap, save/reopen and export. Verify file chooser/download interaction on Windows and no editor chrome in the exported frames.
+- [x] Run final diff checks and review the spec against implemented behavior. Commit documentation and fixes, launch the application, and provide the local URL and verified export result.
 
 ## Self-review
 

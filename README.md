@@ -15,6 +15,8 @@ npm.cmd start
 
 Open **http://127.0.0.1:4173**. Keep the terminal running while editing and exporting. For development, use `npm.cmd run dev` instead. The application binds only to the local computer; it does not upload MIDI or projects to a service.
 
+A small example pattern is included at [public/examples/broken-beat.mid](public/examples/broken-beat.mid) for trying the editor.
+
 If FFmpeg is in a custom location:
 
 ```powershell

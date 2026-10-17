@@ -58,18 +58,20 @@ test("exports a real MP4 at the requested dimensions and rejects cross-origin wr
     r_frame_rate: "30/1",
   });
   expect(Number(info.format.duration)).toBeCloseTo(2, 1);
+  const lateCancel = await request.delete("/api/jobs/" + id, {
+    headers: { "X-Session-Token": token },
+  });
+  expect((await lateCancel.json()).status).toBe("complete");
 });
 test("exports from the GUI while preserving the project snapshot", async ({
   page,
 }) => {
   await page.goto("/");
-  await page
-    .getByLabel("Upload MIDI")
-    .setInputFiles({
-      name: "kick.mid",
-      mimeType: "audio/midi",
-      buffer: Buffer.from(singleKickFixture()),
-    });
+  await page.getByLabel("Upload MIDI").setInputFiles({
+    name: "kick.mid",
+    mimeType: "audio/midi",
+    buffer: Buffer.from(singleKickFixture()),
+  });
   await page.getByLabel("Canvas width").fill("320");
   await page.getByLabel("Canvas height").fill("568");
   await page.getByRole("button", { name: "Apply dimensions" }).click();
@@ -168,4 +170,69 @@ test("uses identical preview and export drawing at the same timestamps", async (
     });
   }, p);
   expect(equal).toBe(true);
+});
+
+test("shows current canvas dimensions after a previous export and rejects fractional repeats", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page
+    .getByLabel("Upload MIDI")
+    .setInputFiles({
+      name: "kick.mid",
+      mimeType: "audio/midi",
+      buffer: Buffer.from(singleKickFixture()),
+    });
+  await page.getByLabel("Canvas width").fill("320");
+  await page.getByLabel("Canvas height").fill("568");
+  await page.getByRole("button", { name: "Apply dimensions" }).click();
+  await page.getByRole("button", { name: "Export video", exact: true }).click();
+  await page.getByLabel("Repeat count").fill("1.5");
+  await page.getByLabel("Repeat count").blur();
+  await expect(page.getByLabel("Repeat count")).toHaveValue("1");
+  await page.getByRole("button", { name: "Render MP4", exact: true }).click();
+  await expect(page.getByRole("link", { name: "Download MP4" })).toBeVisible();
+  await page.getByRole("button", { name: "Close export dialog" }).click();
+  await page.getByLabel("Canvas width").fill("640");
+  await page.getByRole("button", { name: "Apply dimensions" }).click();
+  await page.getByRole("button", { name: "Export video", exact: true }).click();
+  await expect(page.locator(".export-size")).toContainText("640 × 568");
+});
+
+test("allows a new export after the service loses a running job", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page
+    .getByLabel("Upload MIDI")
+    .setInputFiles({
+      name: "kick.mid",
+      mimeType: "audio/midi",
+      buffer: Buffer.from(singleKickFixture()),
+    });
+  await page.route("**/api/jobs", (route) =>
+    route.fulfill({
+      status: 202,
+      contentType: "application/json",
+      body: JSON.stringify({
+        id: "expired-job",
+        status: "queued",
+        completedFrames: 0,
+        totalFrames: 60,
+      }),
+    }),
+  );
+  await page.route("**/api/jobs/expired-job", (route) =>
+    route.fulfill({
+      status: 404,
+      contentType: "application/json",
+      body: JSON.stringify({ error: "Export not found." }),
+    }),
+  );
+  await page.getByRole("button", { name: "Export video", exact: true }).click();
+  await page.getByRole("button", { name: "Render MP4", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Render MP4", exact: true }),
+  ).toBeEnabled();
+  await expect(page.getByText("Export failed", { exact: true })).toBeVisible();
 });

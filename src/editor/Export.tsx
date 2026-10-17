@@ -46,6 +46,16 @@ export default function Export({
       try {
         const response = await fetch("/api/jobs/" + job.id);
         const next = await response.json();
+        if (response.status === 404) {
+          if (!disposed)
+            setJob({
+              ...job,
+              status: "failed",
+              error:
+                "The render service no longer has this job. Render again to create a new video.",
+            });
+          return;
+        }
         if (!response.ok) throw new Error(next.error);
         if (!disposed) {
           setJob(next);
@@ -89,8 +99,8 @@ export default function Export({
     if (!job) return;
     setBusy(true);
     try {
-      await api("/api/jobs/" + job.id, "DELETE");
-      setJob({ ...job, status: "cancelled" });
+      const latest = await api("/api/jobs/" + job.id, "DELETE");
+      setJob(latest);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not cancel.");
     } finally {
@@ -120,7 +130,7 @@ export default function Export({
           </button>
         </div>
         <div className="export-size">
-          {active || job?.status === "complete"
+          {active
             ? snapshot
             : project.canvas.width + " × " + project.canvas.height + " pixels"}
         </div>
@@ -196,6 +206,9 @@ export default function Export({
         )}
         {job && (
           <div className="job-progress" aria-live="polite">
+            {job.status === "complete" && (
+              <small>Completed video: {snapshot}</small>
+            )}
             <strong>
               {job.status === "complete"
                 ? "Video ready"

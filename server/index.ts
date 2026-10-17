@@ -64,8 +64,11 @@ app.get("/api/jobs/:id", (req, res) => {
   res.json(job);
 });
 app.delete("/api/jobs/:id", async (req, res) => {
-  const found = await jobs.cancel(String(req.params.id));
-  res.status(found ? 200 : 404).json({ cancelled: found });
+  const id = String(req.params.id);
+  const found = await jobs.cancel(id);
+  res
+    .status(found ? 200 : 404)
+    .json(found ? jobs.get(id) : { error: "Export not found." });
 });
 app.get("/api/jobs/:id/video", (req, res) => {
   const id = String(req.params.id),

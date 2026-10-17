@@ -43,7 +43,10 @@ export function NumberField({
         max={max}
         step={step}
         onChange={(e) => setText(e.target.value)}
-        onBlur={commit}
+        onBlur={(e) => {
+          if (e.currentTarget.validity.valid) commit();
+          else setText(String(value));
+        }}
         onKeyDown={(e) => {
           if (e.key === "Enter") e.currentTarget.blur();
         }}
