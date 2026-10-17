@@ -147,6 +147,23 @@ aside {
   padding: 5px 10px;
   background: transparent;
 }
+.stage-toolbar {
+  flex-wrap: wrap;
+}
+.canvas-background {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.canvas-background input {
+  width: 34px;
+  height: 28px;
+  padding: 2px;
+  border: 1px solid #40516a;
+  border-radius: 5px;
+  background: #172436;
+  cursor: pointer;
+}
 .canvas-viewport {
   display: flex;
   align-items: center;

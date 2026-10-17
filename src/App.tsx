@@ -362,6 +362,20 @@ export default function App() {
                 Redo
               </button>
             </div>
+            <label className="canvas-background">
+              <span>Background</span>
+              <input
+                type="color"
+                aria-label="Canvas background color"
+                value={project.canvas.background}
+                onChange={(event) =>
+                  commit({
+                    ...project,
+                    canvas: { ...project.canvas, background: event.target.value },
+                  })
+                }
+              />
+            </label>
             <span>
               {project.canvas.width} × {project.canvas.height}
             </span>
