@@ -14,7 +14,7 @@ A local MIDI-to-video editor. Map MIDI notes to drum elements, arrange and style
 
 Prefer no installation? [Download the portable app](https://github.com/VanKyle00/drum-pattern-visualizer/releases/download/v1.1.0/Drum-Canvas-Portable-1.1.0-x64.exe) and double-click it. The first launch may take a moment to unpack.
 
-This release is unsigned, so Windows may show a publisher warning. You can also find downloads on the [releases page](https://github.com/VanKyle00/drum-pattern-visualizer/releases). If GitHub asks you to sign in, use an account with access to this private repository.
+This release is unsigned, so Windows may show a publisher warning. You can also find downloads on the [releases page](https://github.com/VanKyle00/drum-pattern-visualizer/releases).
 
 ## Make your first video
 
