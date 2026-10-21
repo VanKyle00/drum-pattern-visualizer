@@ -1,0 +1,36 @@
+appId: com.vankyle.drumcanvas
+productName: Drum Canvas
+directories:
+  app: desktop-dist/app
+  output: release
+  buildResources: build
+files:
+  - "**/*"
+  - "!node_modules/**/*"
+asar: true
+npmRebuild: false
+electronLanguages:
+  - en-US
+extraResources:
+  - from: node_modules/ffmpeg-static/ffmpeg.exe
+    to: ffmpeg/ffmpeg.exe
+  - from: node_modules/ffmpeg-static/ffmpeg.exe.LICENSE
+    to: ffmpeg/LICENSE.txt
+  - from: node_modules/ffmpeg-static/ffmpeg.exe.README
+    to: ffmpeg/README.txt
+win:
+  icon: build/icon.ico
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  artifactName: "Drum-Canvas-Setup-${version}-${arch}.${ext}"
+portable:
+  artifactName: "Drum-Canvas-Portable-${version}-${arch}.${ext}"

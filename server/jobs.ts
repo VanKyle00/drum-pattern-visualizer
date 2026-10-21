@@ -2,7 +2,11 @@ import { randomUUID } from "node:crypto";
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { mkdir, rename, stat, rm } from "node:fs/promises";
 import path from "node:path";
-import { chromium, type Browser } from "@playwright/test";
+import {
+  createBrowserRenderer,
+  type FrameRenderer,
+  type RendererFactory,
+} from "./renderer";
 import {
   base64ToBytes,
   projectSchema,
@@ -48,7 +52,7 @@ type Job = JobInfo & {
   output: string;
   cancelled: boolean;
   process?: ChildProcessWithoutNullStreams;
-  browser?: Browser;
+  renderer?: FrameRenderer;
   finished?: Promise<void>;
 };
 export class Jobs {
@@ -57,6 +61,7 @@ export class Jobs {
     private root: string,
     private origin: string,
     private ffmpeg = process.env.FFMPEG_PATH || "ffmpeg",
+    private rendererFactory: RendererFactory = createBrowserRenderer,
   ) {}
   get(id: string): JobInfo | undefined {
     const j = this.jobs.get(id);
@@ -102,7 +107,7 @@ export class Jobs {
     if (!["queued", "rendering", "encoding"].includes(job.status)) return true;
     job.cancelled = true;
     job.process?.kill();
-    await job.browser?.close().catch(() => {});
+    await job.renderer?.close().catch(() => {});
     await job.finished;
     return true;
   }
@@ -119,14 +124,9 @@ export class Jobs {
     try {
       await mkdir(job.directory, { recursive: true });
       cancelled();
-      job.browser = await chromium.launch({ headless: true });
+      job.renderer = await this.rendererFactory();
       cancelled();
-      const page = await job.browser.newPage();
-      await page.goto(this.origin + "/render.html");
-      await page.waitForFunction(
-        () => typeof window.prepareProject === "function",
-      );
-      await page.evaluate((p) => window.prepareProject(p), project);
+      await job.renderer.prepare(this.origin, project);
       cancelled();
       const temporary = path.join(job.directory, "partial.mp4");
       const encoder = spawn(
@@ -181,10 +181,7 @@ export class Jobs {
         if (encoderError) throw encoderError;
         if (encoder.exitCode !== null)
           throw new Error(stderr || "Video encoder exited early.");
-        const data = await page.evaluate(
-          (t) => window.renderFrame(t),
-          frameTime(project.export, i),
-        );
+        const data = await job.renderer.frame(frameTime(project.export, i));
         cancelled();
         const buffer = Buffer.from(data.slice(data.indexOf(",") + 1), "base64");
         await new Promise<void>((resolve, reject) =>
@@ -224,8 +221,8 @@ export class Jobs {
           () => {},
         );
     } finally {
-      await job.browser?.close().catch(() => {});
-      job.browser = undefined;
+      await job.renderer?.close().catch(() => {});
+      job.renderer = undefined;
       job.process = undefined;
     }
   }

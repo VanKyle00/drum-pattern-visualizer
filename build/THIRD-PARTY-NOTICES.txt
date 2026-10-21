@@ -1,0 +1,12 @@
+Drum Canvas desktop runtime
+
+Electron and Chromium notices are distributed alongside the executable as LICENSE and LICENSES.chromium.html.
+Electron source: https://github.com/electron/electron
+
+FFmpeg is a separate bundled executable distributed through ffmpeg-static 5.3.0, binary release b6.1.1.
+Its GPL license and build README are included in resources/ffmpeg.
+Binary/source release: https://github.com/eugeneware/ffmpeg-static/releases/tag/b6.1.1
+Build sources: https://github.com/eugeneware/ffmpeg-static
+FFmpeg upstream source: https://ffmpeg.org/
+
+JavaScript dependency license notices retained by the bundler are in main.cjs.LEGAL.txt.

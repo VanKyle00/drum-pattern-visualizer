@@ -1,6 +1,6 @@
 {
   "name": "drum-pattern-visualizer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,7 +8,12 @@
     "build": "tsc --noEmit && vite build",
     "start": "tsx server/index.ts",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "desktop:build": "npm run build && node scripts/build-desktop.mjs",
+    "desktop:dev": "npm run desktop:build && electron desktop-dist/app",
+    "desktop:pack": "npm run desktop:build && electron-builder --config electron-builder.yml --win --x64 --dir",
+    "desktop:dist": "npm run desktop:build && electron-builder --config electron-builder.yml --win --x64 --publish never",
+    "test:desktop": "playwright test -c playwright.desktop.config.ts"
   },
   "dependencies": {
     "express": "^5.3.0",
@@ -24,10 +29,16 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
+    "electron": "^45.0.0",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.28.2",
+    "ffmpeg-static": "^5.3.0",
     "prettier": "^3.9.10",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.4",
     "vitest": "^5.0.5"
-  }
+  },
+  "description": "Local MIDI-to-video desktop editor",
+  "author": "VanKyle00"
 }

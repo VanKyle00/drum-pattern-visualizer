@@ -2,7 +2,18 @@
 
 A local MIDI-to-video editor. Map MIDI notes to drum elements, arrange and style their reactive shapes, then export an MP4 for your video editor.
 
-## Run on Windows
+## Windows desktop app
+
+Download the Windows x64 installer or portable executable from the repository's Releases page.
+
+- **Drum-Canvas-Setup-1.1.0-x64.exe** installs for your Windows account and adds Start menu and desktop shortcuts.
+- **Drum-Canvas-Portable-1.1.0-x64.exe** runs without installation. Its first launch extracts the bundled runtime and can take a moment.
+
+Both include the rendering engine and FFmpeg. No terminal, Node.js installation, or separate FFmpeg setup is needed. The editor runs locally in its own window, remembers window size and position, and uses Windows Save As dialogs for projects and videos. The executables are unsigned, so Windows may show a publisher warning.
+
+Save your project before closing; projects are not autosaved. Desktop render files are stored in `%APPDATA%\Drum Canvas\render-jobs`. Completed job folders can be removed while the app is closed after saving the videos you need.
+
+## Run from source in a browser
 
 Install Node.js 22.12+ (Node 24 recommended) and FFmpeg with both `ffmpeg` and `ffprobe` on PATH. From this project folder:
 

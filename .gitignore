@@ -5,3 +5,6 @@ dist/
 test-results/
 playwright-report/
 *.log
+desktop-dist/
+release/
+desktop-test-results/
