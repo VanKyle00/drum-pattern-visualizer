@@ -2,18 +2,49 @@
 
 A local MIDI-to-video editor. Map MIDI notes to drum elements, arrange and style their reactive shapes, then export an MP4 for your video editor.
 
-## Windows desktop app
+![Drum Canvas editor with MIDI mapping, draggable shapes, and canvas controls](docs/images/editor.png)
 
-Download the Windows x64 installer or portable executable from the repository's Releases page.
+## Install on Windows
 
-- **Drum-Canvas-Setup-1.1.0-x64.exe** installs for your Windows account and adds Start menu and desktop shortcuts.
-- **Drum-Canvas-Portable-1.1.0-x64.exe** runs without installation. Its first launch extracts the bundled runtime and can take a moment.
+**Windows 10/11, 64-bit.** Everything is included—no terminal, Node.js, or FFmpeg setup.
 
-Both include the rendering engine and FFmpeg. No terminal, Node.js installation, or separate FFmpeg setup is needed. The editor runs locally in its own window, remembers window size and position, and uses Windows Save As dialogs for projects and videos. The executables are unsigned, so Windows may show a publisher warning.
+1. [Download the Windows installer](https://github.com/VanKyle00/drum-pattern-visualizer/releases/download/v1.1.0/Drum-Canvas-Setup-1.1.0-x64.exe) (126 MB).
+2. Open the downloaded `.exe` and follow the setup steps.
+3. Launch **Drum Canvas** from your desktop or Start menu.
 
-Save your project before closing; projects are not autosaved. Desktop render files are stored in `%APPDATA%\Drum Canvas\render-jobs`. Completed job folders can be removed while the app is closed after saving the videos you need.
+Prefer no installation? [Download the portable app](https://github.com/VanKyle00/drum-pattern-visualizer/releases/download/v1.1.0/Drum-Canvas-Portable-1.1.0-x64.exe) and double-click it. The first launch may take a moment to unpack.
 
-## Run from source in a browser
+This release is unsigned, so Windows may show a publisher warning. You can also find downloads on the [releases page](https://github.com/VanKyle00/drum-pattern-visualizer/releases). If GitHub asks you to sign in, use an account with access to this private repository.
+
+## Make your first video
+
+1. Click **Upload MIDI** and select a `.mid` file. Try the included [example drum pattern](public/examples/broken-beat.mid).
+2. Select each drum element and assign its MIDI notes. Drag the shapes into place, then customize their size, shape, and color.
+3. Choose the canvas dimensions and **Background** color. Press **Play** to preview.
+4. Click **Export video** → **Render MP4** → **Download MP4**, then choose where to save it.
+
+The video is silent—add your drum audio in your video editor. Use **Save project** before closing so you can continue later; projects are not autosaved.
+
+### See the motion
+
+This looping preview comes from an actual exported video:
+
+![Portrait video with kick, snare, and hi-hat shapes reacting to a MIDI drum pattern](docs/images/reactive-preview.gif)
+
+## What you can customize
+
+| Control | What it does |
+| --- | --- |
+| MIDI mapping | Assign notes and channels to kick, snare, hi-hat, or your own custom drums. |
+| Shape and layout | Drag and resize elements; choose circles, squares, diamonds, or triangles. |
+| Motion and color | Change fill colors, hit expansion, decay, ripples, and particles. |
+| Canvas | Choose portrait, landscape, square, or custom dimensions and a background color. |
+| Video export | Save an H.264 MP4 at 30 or 60 fps, ready for further editing. |
+
+Everything runs locally. The desktop app remembers its window size and position and uses Windows Save As dialogs for videos and projects.
+
+<details>
+<summary>For developers: run from source in a browser</summary>
 
 Install Node.js 22.12+ (Node 24 recommended) and FFmpeg with both `ffmpeg` and `ffprobe` on PATH. From this project folder:
 
@@ -36,6 +67,8 @@ npm.cmd start
 ```
 
 Use `$env:PORT = '4174'` before launching to choose a different port.
+
+</details>
 
 ## Editing
 
@@ -62,7 +95,7 @@ The result is an H.264 MP4 with a solid background and no audio. Canvas guides a
 
 When ready, **Download MP4** saves through your browser's download folder or Save As dialog. Names include a unique export ID. You can close and reopen the export dialog while a job runs. Cancelling or failing an export does not publish a partial file.
 
-Rendered files are kept under `.render-jobs/<job-id>/video.mp4` in the project directory. Download links work until the local server restarts; files remain on disk afterwards. You can remove completed job folders when the server is stopped and you have saved the videos you need. This directory is ignored by Git.
+The desktop app keeps render files in `%APPDATA%\Drum Canvas\render-jobs`; the browser version uses `.render-jobs/<job-id>/video.mp4` in the project directory. Download links work until the app or local server restarts; files remain on disk afterwards. You can remove completed job folders when the app is closed and you have saved the videos you need. These files are not tracked by Git.
 
 ## Verification
 
