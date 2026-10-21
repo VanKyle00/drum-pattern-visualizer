@@ -31,6 +31,12 @@ This looping preview comes from an actual exported video:
 
 ![Portrait video with kick, snare, and hi-hat shapes reacting to a MIDI drum pattern](docs/images/reactive-preview.gif)
 
+### Usage example
+
+Drum Canvas visuals composited into a music video. This silent, looping GIF shows an example of using the exported animation in a finished edit.
+
+![Drum Canvas shapes animated over guitar performance footage in a music video](docs/images/usage-example.gif)
+
 ## What you can customize
 
 | Control | What it does |
